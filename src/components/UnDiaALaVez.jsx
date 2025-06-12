@@ -1,57 +1,17 @@
 // src/components/UnDiaALaVez.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react'; // Ya no necesitamos useEffect para la API
 import { ArrowRight, Menu, X, Play, Book, Music, MessageCircle, Heart, ChevronDown } from 'lucide-react';
 
 const UnDiaALaVez = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('inicio');
-  const [dailyVerse, setDailyVerse] = useState({ text: 'Cargando versículo...', reference: '' });
-  const [bibleError, setBibleError] = useState(null);
-
-  useEffect(() => {
-    const fetchDailyVerse = async () => {
-      // Reemplaza 'YOUR_ESV_API_KEY' con tu clave API real de ESV
-      // Puedes obtener una aquí: https://api.esv.org/
-      const ESV_API_KEY = 'YOUR_ESV_API_KEY'; 
-      const passage = 'John 3:16'; // Puedes cambiar el pasaje o hacerlo dinámico
-
-      if (ESV_API_KEY === 'YOUR_ESV_API_KEY') {
-        setBibleError("¡ADVERTENCIA! Por favor, reemplaza 'YOUR_ESV_API_KEY' con tu clave API real para leer la Biblia.");
-        setDailyVerse({ text: 'Clave API no configurada. Por favor, revisa el código.', reference: 'Configuración' });
-        return;
-      }
-
-      try {
-        const response = await fetch(`https://api.esv.org/v3/passage/text/?q=${passage}&include-footnotes=false&include-chapter-numbers=false&include-verse-numbers=true&include-short-copyright=false&include-passage-horizontal-lines=false&include-heading=false`, {
-          headers: {
-            'Authorization': `Token ${ESV_API_KEY}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (data.passages && data.passages.length > 0) {
-          setDailyVerse({
-            text: data.passages[0].trim(),
-            reference: data.canonical
-          });
-          setBibleError(null);
-        } else {
-          setBibleError("No se encontró el versículo o el pasaje.");
-          setDailyVerse({ text: 'No se pudo cargar el versículo.', reference: '' });
-        }
-      } catch (error) {
-        console.error("Error al cargar el versículo de la Biblia:", error);
-        setBibleError("Error al conectar con la API de la Biblia. Inténtalo de nuevo más tarde.");
-        setDailyVerse({ text: 'Error al cargar el versículo.', reference: '' });
-      }
-    };
-
-    fetchDailyVerse();
-  }, []); // El array vacío asegura que se ejecute solo una vez al montar
+  
+  // Versículo del día estático, sin API
+  const [dailyVerse] = useState({ 
+    text: '"Esfuérzate y sé valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo..."', 
+    reference: 'Josué 1:9' 
+  });
+  // bibleError ya no es necesario, lo quitamos.
 
   const navItems = [
     { name: 'INICIO', href: '#inicio', id: 'inicio' },
@@ -71,6 +31,8 @@ const UnDiaALaVez = () => {
 
   const handlePreviousReadingClick = (title) => {
     alert(`Has hecho clic en: ${title}. Aquí se cargaría el contenido de la lectura.`);
+    // Implementa aquí la lógica para cargar la lectura correspondiente,
+    // por ejemplo, cambiando un estado o navegando a otra ruta.
   };
 
   return (
@@ -197,11 +159,13 @@ const UnDiaALaVez = () => {
               <div className="relative bg-white rounded-3xl p-8 shadow-lg hover:scale-105 transition-transform duration-300 w-full max-w-sm"> {/* Ancho máximo para la tarjeta de imagen */}
                 <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center">
                   <div className="text-center space-y-4">
-                    {/* Placeholder para la imagen, reemplaza con tu URL real */}
+                    {/* Placeholder para la imagen de perfil, reemplaza con tu URL real */}
                     <div className="w-20 h-20 bg-[#E2725B] rounded-full flex items-center justify-center mx-auto overflow-hidden">
-                      {/* Aquí puedes usar una imagen de tu drive. Ejemplo: */}
-                      {/* <img src="URL_DE_TU_IMAGEN_DE_PERFIL" alt="Tu Foto" className="w-full h-full object-cover" /> */}
-                      <span className="text-white text-3xl">📷</span>
+                       <img 
+                         src="https://via.placeholder.com/80/E2725B/FFFFFF?text=Foto" // Placeholder, reemplaza con tu URL
+                         alt="Tu Foto Personal" 
+                         className="w-full h-full object-cover rounded-full" 
+                       />
                     </div>
                     <div className="space-y-1">
                       <p className="font-body font-medium text-gray-700">Tu Foto Aquí</p>
@@ -211,9 +175,9 @@ const UnDiaALaVez = () => {
                 </div>
               </div>
 
-              {/* Decorative Elements */}
-              <div className="absolute -top-4 -right-4 w-16 h-16 bg-[#E2725B]/10 rounded-full hidden lg:block"></div> {/* Oculto en móvil */}
-              <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-[#E2725B]/5 rounded-full hidden lg:block"></div> {/* Oculto en móvil */}
+              {/* Decorative Elements (ocultos en móvil para limpieza) */}
+              <div className="absolute -top-4 -right-4 w-16 h-16 bg-[#E2725B]/10 rounded-full hidden lg:block"></div>
+              <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-[#E2725B]/5 rounded-full hidden lg:block"></div>
             </div>
           </div>
         </div>
@@ -247,8 +211,12 @@ const UnDiaALaVez = () => {
             <div className="md:col-span-2 mb-8">
               <div className="relative bg-gray-100 rounded-2xl overflow-hidden aspect-video shadow-md hover:shadow-lg transition-shadow duration-300 group">
                 <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-                  {/* Aquí puedes usar una imagen de tu drive como overlay o poster */}
-                  {/* <img src="URL_DE_TU_IMAGEN_DE_VIDEO_POSTER" alt="Video Poster" className="absolute inset-0 w-full h-full object-cover" /> */}
+                  {/* Placeholder para la imagen de video principal, reemplaza con tu URL real */}
+                  <img 
+                    src="https://via.placeholder.com/1280x720/F5F5F5/333333?text=Video+Principal" 
+                    alt="Video Devocional de Hoy" 
+                    className="absolute inset-0 w-full h-full object-cover opacity-80" 
+                  />
                   <button className="relative z-10 w-20 h-20 bg-[#E2725B] rounded-full flex items-center justify-center shadow-lg hover:bg-[#d86650] transition-colors group focus:outline-none focus:ring-4 focus:ring-[#E2725B]/50">
                     <Play className="w-8 h-8 text-white ml-1 group-hover:scale-110 transition-transform" />
                   </button>
@@ -270,8 +238,12 @@ const UnDiaALaVez = () => {
             {[1, 2, 3, 4].map((item) => (
               <div key={item} className={`bg-white border border-gray-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 group`}>
                 <div className="aspect-video bg-gray-50 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
-                    {/* Aquí puedes usar imágenes de tus videos anteriores */}
-                    {/* <img src={`URL_DE_TU_VIDEO_IMAGEN_${item}`} alt={`Video ${item}`} className="w-full h-full object-cover" /> */}
+                    {/* Placeholder para imágenes de videos anteriores */}
+                    <img 
+                      src={`https://via.placeholder.com/480x270/F5F5F5/333333?text=Video+${item}`} 
+                      alt={`Video Devocional Día ${item}`} 
+                      className="w-full h-full object-cover opacity-80" 
+                    />
                   <button className="w-12 h-12 bg-[#E2725B] rounded-full flex items-center justify-center group-hover:bg-[#d86650] transition-colors focus:outline-none focus:ring-2 focus:ring-[#E2725B]/50">
                     <Play className="w-4 h-4 text-white ml-0.5" />
                   </button>
@@ -345,10 +317,11 @@ const UnDiaALaVez = () => {
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <label className="block font-body font-medium text-gray-700 mb-2">
+                    <label htmlFor="ensenanza" className="block font-body font-medium text-gray-700 mb-2">
                       Enseñanza del Día:
                     </label>
                     <textarea
+                      id="ensenanza"
                       className="w-full bg-white border border-gray-200 rounded-lg p-3 font-body text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E2725B]/20 focus:border-[#E2725B] transition-shadow duration-200 hover:shadow-md"
                       rows="3"
                       placeholder="¿Qué te enseñó Dios hoy a través de esta lectura?"
@@ -360,14 +333,11 @@ const UnDiaALaVez = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Sección del Versículo del Día de la API */}
+              {/* Sección del Versículo del Día Estático */}
               <div className="bg-[#E2725B]/5 rounded-xl p-6">
                 <h4 className="font-body font-semibold text-gray-900 mb-4">
                   Versículo del Día
                 </h4>
-                {bibleError && (
-                  <p className="text-sm font-body text-red-600 mb-2">{bibleError}</p>
-                )}
                 <blockquote className="space-y-2">
                   <p className="font-display text-gray-700 italic">
                     {dailyVerse.text}
