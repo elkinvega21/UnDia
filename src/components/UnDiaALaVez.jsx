@@ -1,544 +1,274 @@
 // src/components/UnDiaALaVez.jsx
-import React, { useState } from 'react'; // Ya no necesitamos useEffect para la API
+import React, { useState } from 'react';
 import { ArrowRight, Menu, X, Play, Book, Music, MessageCircle, Heart, ChevronDown } from 'lucide-react';
 
 const UnDiaALaVez = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('inicio');
   
-  // Versículo del día estático, sin API
-  const [dailyVerse] = useState({ 
-    text: '"Esfuérzate y sé valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo..."', 
-    reference: 'Josué 1:9' 
+  // La información y los datos se mantienen intactos
+  const [dailyVerse] = useState({
+    text: '"Esfuérzate y sé valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo..."',
+    reference: 'Josué 1:9'
   });
-  // bibleError ya no es necesario, lo quitamos.
 
   const navItems = [
-    { name: 'INICIO', href: '#inicio', id: 'inicio' },
-    { name: 'VIDEO', href: '#video', id: 'video' },
-    { name: 'LECTURA', href: '#lectura', id: 'lectura' },
-    { name: 'MÚSICA', href: '#musica', id: 'musica' },
-    { name: 'ORACIÓN', href: '#oracion', id: 'oracion' }
+    { name: 'Video', href: '#video' },
+    { name: 'Lectura', href: '#lectura' },
+    { name: 'Música', href: '#musica' },
+    { name: 'Oración', href: '#oracion' }
   ];
 
   const musicTracks = [
     { title: "Paz en la Mañana", duration: "30:00", description: "Música suave para comenzar el día" },
     { title: "Meditación Vespertina", duration: "28:45", description: "Melodías para la reflexión" },
     { title: "Momento de Gratitud", duration: "32:15", description: "Sonidos de adoración silenciosa" },
-    { title: "Oración Profunda", duration: "29:30", description: "Instrumental para la intercesión" },
-    { title: "Descanso en Él", duration: "31:20", description: "Calma para el alma" }
   ];
 
   const handlePreviousReadingClick = (title) => {
     alert(`Has hecho clic en: ${title}. Aquí se cargaría el contenido de la lectura.`);
-    // Implementa aquí la lógica para cargar la lectura correspondiente,
-    // por ejemplo, cambiando un estado o navegando a otra ruta.
   };
 
+  const handleMobileMenuClick = (href) => {
+    setIsMenuOpen(false);
+    // Navegación suave
+    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Componentes de la UI
+  const SectionTitle = ({ children }) => (
+    <h2 className="text-4xl md:text-5xl font-bold text-black tracking-tighter text-center">
+      {children}
+    </h2>
+  );
+  
+  const SectionSubtitle = ({ children }) => (
+    <p className="text-lg text-gray-600 max-w-2xl mx-auto text-center mt-4">
+      {children}
+    </p>
+  );
+
   return (
-    <div className="min-h-screen bg-[#fefefe] font-sans">
-      {/* Custom Font Styles */}
+    <div className="min-h-screen bg-[#F3F3F3] font-custom">
+      {/* --- ESTILOS Y FUENTE PERSONALIZADA --- */}
       <style jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
-        .font-display { font-family: 'Crimson Text', serif; }
-        .font-body { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        
+        .font-custom { 
+            font-family: 'Poppins', sans-serif; 
+        }
+        
+        .underline-doodle {
+          text-decoration: none;
+          position: relative;
+          display: inline-block;
+        }
+        /* CAMBIO: Subrayado más grueso y con mejor espaciado */
+        .underline-doodle::after {
+          content: '';
+          position: absolute;
+          bottom: -10px; 
+          left: 0;
+          right: 0;
+          height: 5px; /* Más grueso */
+          background-image: url('data:image/svg+xml;utf8,<svg width="100" height="5" viewBox="0 0 100 5" xmlns="http://www.w3.org/2000/svg"><path d="M0,2.5 Q25,-2.5 50,2.5 T100,2.5" stroke="%23E95A2B" stroke-width="4" fill="none" /></svg>');
+          background-repeat: repeat-x;
+          background-size: 20px 5px;
+        }
+
+        .circle-doodle {
+           text-decoration: none;
+           position: relative;
+           display: inline-block;
+        }
+        /* CAMBIO: Círculo más grueso y con mejor espaciado */
+        .circle-doodle::before {
+          content: '';
+          position: absolute;
+          top: -25px;      /* Más espacio arriba */
+          bottom: -20px;   /* Más espacio abajo */
+          left: -25px;     /* Más espacio a los lados */
+          right: -25px;
+          border: 4px solid #E95A2B; /* Borde más grueso */
+          border-radius: 50% / 60%;
+          transform: rotate(-3deg);
+          pointer-events: none;
+        }
+        /* CAMBIO: Sombra más pronunciada para el efecto de bloque */
+        .card-shadow {
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        }
       `}</style>
 
-      {/* Header */}
-      <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b border-gray-100 transition-shadow duration-300">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-[#E2725B] rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110">
-                <Heart className="w-4 h-4 text-white" />
-              </div>
-              <h1 className="text-lg font-body font-semibold text-gray-900 tracking-tight">
-                Un Día a la Vez
-              </h1>
-            </div>
+      {/* --- HEADER --- */}
+      <header className="fixed top-0 w-full bg-[#F3F3F3]/80 backdrop-blur-md z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <a href="#inicio" className="text-2xl font-bold text-black tracking-tighter">
+              Un Día a la Vez
+            </a>
 
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={`text-sm font-body font-medium transition-colors duration-200 ${
-                    activeTab === item.id
-                      ? 'text-[#E2725B]'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                  onClick={() => setActiveTab(item.id)}
-                >
+                <a key={item.name} href={item.href} className="font-semibold text-gray-700 hover:text-black transition-colors">
                   {item.name}
                 </a>
               ))}
             </nav>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-600 hover:text-gray-900 transition-colors duration-200 focus:outline-none"
-              >
-                {isMenuOpen ? <X size={22} className="transition-transform duration-200" /> : <Menu size={22} className="transition-transform duration-200" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 transition-all duration-300 ease-in-out"
-               style={{ maxHeight: isMenuOpen ? '500px' : '0', opacity: isMenuOpen ? '1' : '0', overflow: 'hidden' }}>
-            <div className="px-4 py-4 space-y-3">
-              {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="block text-sm font-body font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    setActiveTab(item.id);
-                  }}
+            <div className="flex items-center space-x-4">
+               <a href="#oracion" className="hidden md:block bg-black text-white font-semibold px-5 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+                  Pide Oración
+               </a>
+              <div className="md:hidden">
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="text-black focus:outline-none"
+                  aria-label="Abrir menú"
+                  aria-expanded={isMenuOpen}
                 >
-                  {item.name}
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* Hero Section - Inicio */}
-      <section id="inicio" className="pt-16 min-h-screen flex items-center bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-0"> {/* Añadido padding vertical para mejor responsividad */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Left Content */}
-            <div className="space-y-8 text-center lg:text-left"> {/* Centrado en móvil, alineado a la izquierda en desktop */}
-              <div className="space-y-6">
-                <div className="inline-flex items-center px-3 py-1 bg-[#E2725B]/10 rounded-full">
-                  <span className="text-xs font-body font-medium text-[#E2725B] tracking-wide uppercase">
-                    Devocional Diario
-                  </span>
-                </div>
-
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-semibold text-gray-900 leading-tight">
-                  Un Día
-                  <br className="lg:hidden" /> {/* Salto de línea solo en pantallas grandes */}
-                  <span className="text-[#E2725B]">a la Vez</span>
-                </h1>
-
-                <p className="text-lg font-body text-gray-600 leading-relaxed max-w-md mx-auto lg:mx-0"> {/* mx-auto para centrar en móvil */}
-                  Un espacio para acompañarte en tu día a día con Dios.
-                  Renovar fuerzas, agradecer, orar y recordar que no estás solo.
-                </p>
-              </div>
-
-              <div className="pt-4">
-                <blockquote className="border-l-3 border-[#E2725B] pl-4 space-y-2 max-w-md mx-auto lg:mx-0"> {/* mx-auto para centrar en móvil */}
-                  <p className="font-display text-lg text-gray-700 italic">
-                    "Este es el día que ha hecho el Señor;
-                    Nos gozaremos y alegraremos en él"
-                  </p>
-                  <cite className="text-sm font-body font-medium text-gray-500">
-                    — Salmos 118:24
-                  </cite>
-                </blockquote>
-              </div>
-
-              <button className="group inline-flex items-center px-6 py-3 bg-[#E2725B] text-white font-body font-medium rounded-lg hover:bg-[#d86650] transition-all duration-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#E2725B]/50">
-                Comenzar Hoy
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-
-            {/* Right Content - Profile Image */}
-            <div className="relative flex justify-center lg:justify-end"> {/* Centrado en móvil, alineado a la derecha en desktop */}
-              <div className="relative bg-white rounded-3xl p-8 shadow-lg hover:scale-105 transition-transform duration-300 w-full max-w-sm"> {/* Ancho máximo para la tarjeta de imagen */}
-                <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center">
-                  <div className="text-center space-y-4">
-                    {/* Placeholder para la imagen de perfil, reemplaza con tu URL real */}
-                    <div className="w-20 h-20 bg-[#E2725B] rounded-full flex items-center justify-center mx-auto overflow-hidden">
-                       <img 
-                         src="https://via.placeholder.com/80/E2725B/FFFFFF?text=Foto" // Placeholder, reemplaza con tu URL
-                         alt="Tu Foto Personal" 
-                         className="w-full h-full object-cover rounded-full" 
-                       />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-body font-medium text-gray-700">Tu Foto Aquí</p>
-                      <p className="text-sm font-body text-gray-500">Foto personal/ministerial</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Decorative Elements (ocultos en móvil para limpieza) */}
-              <div className="absolute -top-4 -right-4 w-16 h-16 bg-[#E2725B]/10 rounded-full hidden lg:block"></div>
-              <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-[#E2725B]/5 rounded-full hidden lg:block"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <ChevronDown className="text-gray-400" size={24} />
-        </div>
-      </section>
-
-      {/* Video Devocional Section */}
-      <section id="video" className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-3 py-1 bg-[#E2725B]/10 rounded-full mb-4">
-              <Play className="w-3 h-3 text-[#E2725B] mr-2" />
-              <span className="text-xs font-body font-medium text-[#E2725B] tracking-wide uppercase">
-                Video Devocional
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-display font-semibold text-gray-900 mb-6">
-              Reflexiones en <span className="text-[#E2725B]">Video</span>
-            </h2>
-            <p className="text-lg font-body text-gray-600 max-w-2xl mx-auto">
-              Momentos de reflexión diaria para fortalecer tu fe y renovar tu esperanza
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Video Principal */}
-            <div className="md:col-span-2 mb-8">
-              <div className="relative bg-gray-100 rounded-2xl overflow-hidden aspect-video shadow-md hover:shadow-lg transition-shadow duration-300 group">
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-                  {/* Placeholder para la imagen de video principal, reemplaza con tu URL real */}
-                  <img 
-                    src="https://via.placeholder.com/1280x720/F5F5F5/333333?text=Video+Principal" 
-                    alt="Video Devocional de Hoy" 
-                    className="absolute inset-0 w-full h-full object-cover opacity-80" 
-                  />
-                  <button className="relative z-10 w-20 h-20 bg-[#E2725B] rounded-full flex items-center justify-center shadow-lg hover:bg-[#d86650] transition-colors group focus:outline-none focus:ring-4 focus:ring-[#E2725B]/50">
-                    <Play className="w-8 h-8 text-white ml-1 group-hover:scale-110 transition-transform" />
-                  </button>
-                </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
-                    <h3 className="font-body font-semibold text-gray-900 mb-1">
-                      Video Devocional de Hoy
-                    </h3>
-                    <p className="text-sm font-body text-gray-600">
-                      Una palabra de esperanza para este día
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Videos Anteriores */}
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className={`bg-white border border-gray-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 group`}>
-                <div className="aspect-video bg-gray-50 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
-                    {/* Placeholder para imágenes de videos anteriores */}
-                    <img 
-                      src={`https://via.placeholder.com/480x270/F5F5F5/333333?text=Video+${item}`} 
-                      alt={`Video Devocional Día ${item}`} 
-                      className="w-full h-full object-cover opacity-80" 
-                    />
-                  <button className="w-12 h-12 bg-[#E2725B] rounded-full flex items-center justify-center group-hover:bg-[#d86650] transition-colors focus:outline-none focus:ring-2 focus:ring-[#E2725B]/50">
-                    <Play className="w-4 h-4 text-white ml-0.5" />
-                  </button>
-                </div>
-                <h3 className="font-body font-semibold text-gray-900 mb-2">
-                  Devocional Día {item}
-                </h3>
-                <p className="text-sm font-body text-gray-600">
-                  Reflexión sobre la gracia y misericordia de Dios
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Lectura Devocional Section */}
-      <section id="lectura" className="py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-3 py-1 bg-[#E2725B]/10 rounded-full mb-4">
-              <Book className="w-3 h-3 text-[#E2725B] mr-2" />
-              <span className="text-xs font-body font-medium text-[#E2725B] tracking-wide uppercase">
-                Lectura Devocional
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-display font-semibold text-gray-900 mb-6">
-              Devocionales <span className="text-[#E2725B]">Escritos</span>
-            </h2>
-            <p className="text-lg font-body text-gray-600 max-w-2xl mx-auto">
-              Textos inspiradores para meditar, resaltar y reflexionar en tu tiempo personal con Dios
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Devocional Principal */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl p-8 shadow-sm">
-                <div className="mb-6">
-                  <span className="text-sm font-body font-medium text-[#E2725B] mb-2 block">
-                    DEVOCIONAL DE HOY
-                  </span>
-                  <h3 className="text-2xl font-display font-semibold text-gray-900 mb-4">
-                    Caminando en Fe
-                  </h3>
-                  <div className="prose prose-gray max-w-none">
-                    <p className="font-body text-gray-700 leading-relaxed mb-4">
-                      "Por tanto, no desmayamos; antes aunque este nuestro hombre exterior se va desgastando,
-                      el interior no obstante se renueva de día en día." - 2 Corintios 4:16
-                    </p>
-                    <p className="font-body text-gray-600 leading-relaxed">
-                      Cada día es una nueva oportunidad para crecer en nuestra fe. Aunque enfrentemos desafíos
-                      y dificultades, podemos confiar en que Dios está obrando en nosotros, renovando
-                      nuestro espíritu y fortaleciendo nuestro corazón...
-                    </p>
-                  </div>
-                </div>
-
-                {/* Funciones de Lectura */}
-                <div className="border-t border-gray-100 pt-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-body font-medium text-gray-700">Herramientas de Lectura:</span>
-                    <div className="flex space-x-2">
-                      <button className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-body font-medium rounded-full hover:bg-yellow-200 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-200">
-                        Resaltar
-                      </button>
-                      <button className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-body font-medium rounded-full hover:bg-blue-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-200">
-                        Nota
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <label htmlFor="ensenanza" className="block font-body font-medium text-gray-700 mb-2">
-                      Enseñanza del Día:
-                    </label>
-                    <textarea
-                      id="ensenanza"
-                      className="w-full bg-white border border-gray-200 rounded-lg p-3 font-body text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E2725B]/20 focus:border-[#E2725B] transition-shadow duration-200 hover:shadow-md"
-                      rows="3"
-                      placeholder="¿Qué te enseñó Dios hoy a través de esta lectura?"
-                    ></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Sección del Versículo del Día Estático */}
-              <div className="bg-[#E2725B]/5 rounded-xl p-6">
-                <h4 className="font-body font-semibold text-gray-900 mb-4">
-                  Versículo del Día
-                </h4>
-                <blockquote className="space-y-2">
-                  <p className="font-display text-gray-700 italic">
-                    {dailyVerse.text}
-                  </p>
-                  {dailyVerse.reference && (
-                    <cite className="text-sm font-body font-medium text-gray-500">
-                      — {dailyVerse.reference}
-                    </cite>
-                  )}
-                </blockquote>
-              </div>
-
-              <div className="bg-white rounded-xl p-6">
-                <h4 className="font-body font-semibold text-gray-900 mb-4">
-                  Lecturas Anteriores
-                </h4>
-                <div className="space-y-3">
-                  {['Esperanza en Tiempos Difíciles', 'La Paz que Sobrepasa', 'Gratitud Diaria'].map((title, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handlePreviousReadingClick(title)}
-                      className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors text-left w-full focus:outline-none focus:ring-2 focus:ring-[#E2725B]/20"
-                    >
-                      <span className="font-body font-medium text-gray-700 text-sm">{title}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Música Section */}
-      <section id="musica" className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-3 py-1 bg-[#E2725B]/10 rounded-full mb-4">
-              <Music className="w-3 h-3 text-[#E2725B] mr-2" />
-              <span className="text-xs font-body font-medium text-[#E2725B] tracking-wide uppercase">
-                Música Instrumental
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-display font-semibold text-gray-900 mb-6">
-              Música para <span className="text-[#E2725B]">Orar</span>
-            </h2>
-            <p className="text-lg font-body text-gray-600 max-w-2xl mx-auto">
-              Melodías instrumentales para acompañar tus momentos de oración y meditación
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {musicTracks.map((track, index) => (
-              <div key={index} className={`bg-gray-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 group`}>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-[#E2725B] rounded-full flex items-center justify-center group-hover:bg-[#d86650] transition-colors">
-                    <Play className="w-5 h-5 text-white ml-0.5" />
-                  </div>
-                  <span className="text-sm font-body font-medium text-gray-500">{track.duration}</span>
-                </div>
-
-                <h3 className="font-body font-semibold text-gray-900 mb-2">
-                  {track.title}
-                </h3>
-                <p className="text-sm font-body text-gray-600">
-                  {track.description}
-                </p>
-              </div>
-            ))}
-
-            {/* Playlist Completa */}
-            <div className="md:col-span-2 lg:col-span-3 mt-6">
-              <div className="bg-gradient-to-r from-[#E2725B] to-[#d86650] rounded-2xl p-8 text-white text-center hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-lg">
-                <Music className="w-12 h-12 mx-auto mb-4 opacity-90" />
-                <h3 className="text-xl font-body font-semibold mb-2">
-                  Playlist Completa
-                </h3>
-                <p className="font-body opacity-90 mb-6">
-                  Todas las pistas en una lista de reproducción continua para tus devocionales
-                </p>
-                <button className="px-6 py-3 bg-white text-[#E2725B] font-body font-medium rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#E2725B]/20">
-                  Reproducir Todo
+                  {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
                 </button>
               </div>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Pedidos de Oración Section */}
-      <section id="oracion" className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-3 py-1 bg-[#E2725B]/10 rounded-full mb-4">
-              <MessageCircle className="w-3 h-3 text-[#E2725B] mr-2" />
-              <span className="text-xs font-body font-medium text-[#E2725B] tracking-wide uppercase">
-                Pedidos de Oración
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-display font-semibold text-gray-900 mb-6">
-              Compartir en <span className="text-[#E2725B]">Oración</span>
-            </h2>
-            <p className="text-lg font-body text-gray-600 max-w-2xl mx-auto">
-              Comparte tus peticiones de oración con nuestra comunidad. No estás solo en este caminar
-            </p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="nombre" className="block font-body font-medium text-gray-700 mb-2">
-                    Nombre (opcional)
-                  </label>
-                  <input
-                    type="text"
-                    id="nombre"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 font-body text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E2725B]/20 focus:border-[#E2725B] focus:bg-white transition-shadow duration-200 hover:shadow-md"
-                    placeholder="Tu nombre"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block font-body font-medium text-gray-700 mb-2">
-                    Email (opcional)
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 font-body text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E2725B]/20 focus:border-[#E2725B] focus:bg-white transition-shadow duration-200 hover:shadow-md"
-                    placeholder="tu@email.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="peticion" className="block font-body font-medium text-gray-700 mb-2">
-                  Petición de Oración
-                </label>
-                <textarea
-                  id="peticion"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 font-body text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E2725B]/20 focus:border-[#E2725B] focus:bg-white transition-shadow duration-200 hover:shadow-md"
-                  rows="6"
-                  placeholder="Comparte aquí tu petición de oración. Nos uniremos contigo en oración..."
-                ></textarea>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="anonymous"
-                  className="w-4 h-4 text-[#E2725B] border-gray-300 rounded focus:ring-[#E2725B]/20 transition-shadow duration-200 hover:shadow-md"
-                />
-                <label htmlFor="anonymous" className="ml-2 font-body text-sm text-gray-600">
-                  Mantener esta petición anónima
-                </label>
-              </div>
-
-              <button type="submit" className="w-full py-4 bg-[#E2725B] text-white font-body font-medium rounded-lg hover:bg-[#d86650] transition-colors shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#E2725B]/20">
-                Enviar Petición de Oración
-              </button>
-            </form>
-
-            <div className="mt-8 pt-8 border-t border-gray-100 text-center">
-              <p className="font-body text-sm text-gray-500">
-                Tu petición será enviada directamente y oraremos por ti.
-                <br />
-                "Orad unos por otros" - Santiago 5:16
-              </p>
-            </div>
-          </div>
+        
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-96 border-t border-gray-200' : 'max-h-0'}`}>
+            <div className="bg-[#F3F3F3] px-6 py-4 space-y-4">
+              {navItems.map((item) => (
+                  <a key={item.name} href={item.href} className="block font-semibold text-gray-700 hover:text-black text-lg" onClick={() => handleMobileMenuClick(item.href)}>
+                    {item.name}
+                  </a>
+              ))}
+               <a href="#oracion" className="block w-full text-center mt-2 bg-black text-white font-semibold px-5 py-3 rounded-lg text-lg hover:bg-gray-800 transition-colors" onClick={() => handleMobileMenuClick('#oracion')}>
+                  Pide Oración
+               </a>
+             </div>
         </div>
-      </section>
+      </header>
 
-      {/* Footer */}
-      <footer className="py-12 bg-white border-t border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-6">
-            <div className="flex items-center justify-center space-x-3">
-              <div className="w-8 h-8 bg-[#E2725B] rounded-full flex items-center justify-center">
-                <Heart className="w-4 h-4 text-white" />
-              </div>
-              <h3 className="text-xl font-body font-semibold text-gray-900">
-                Un Día a la Vez
-              </h3>
+      {/* --- HERO SECTION --- */}
+      <section id="inicio" className="min-h-screen flex flex-col justify-center items-center text-center px-4">
+        {/* CAMBIO: Contenedor con más padding para bajar el título */}
+        <div className="max-w-4xl mx-auto pt-32 pb-8">
+            <h1 className="text-6xl md:text-8xl font-extrabold text-black tracking-tighter leading-tight">
+                UN DÍA <span className="circle-doodle">A LA VEZ</span>, EL ESPACIO QUE SERÁ <span className="underline-doodle">LA BASE DE TU FE</span>
+            </h1>
+            <p className="mt-12 text-xl text-gray-600 max-w-2xl mx-auto">
+                Juntos construiremos un cimiento fuerte para tu vida espiritual, sin importar las circunstancias.
+            </p>
+        </div>
+        <div className="mt-12">
+            <div className="w-40 h-40 bg-orange-200 rounded-full flex items-center justify-center animate-bounce" style={{animationDuration: '2s'}}>
+                <Heart className="w-16 h-16 text-[#E95A2B]"/>
             </div>
+        </div>
+        <a href="#video" className="absolute bottom-8 animate-bounce">
+          <ChevronDown className="text-[#E95A2B]" size={32} />
+        </a>
+      </section>
+      
+      {/* --- SECCIONES DE CONTENIDO --- */}
+      <main className="space-y-24 py-24 px-4">
 
-            <blockquote className="max-w-2xl mx-auto">
-              <p className="font-display text-lg text-gray-700 italic mb-2">
-                "Este es el día que ha hecho el Señor; Nos gozaremos y alegraremos en él"
-              </p>
-              <cite className="font-body text-sm font-medium text-gray-500">
-                — Salmos 118:24
-              </cite>
-            </blockquote>
+        {/* Video Section */}
+        <section id="video">
+          <SectionTitle>Reflexiones en <span className="text-[#E95A2B]">Video</span></SectionTitle>
+          <SectionSubtitle>Momentos de reflexión diaria para fortalecer tu fe y renovar tu esperanza.</SectionSubtitle>
+          <div className="max-w-5xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[1, 2].map(item => (
+                <div key={item} className="bg-white rounded-2xl p-6 border-2 border-black card-shadow transition-transform hover:scale-105">
+                    <div className="aspect-video bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
+                        <Play className="w-12 h-12 text-[#E95A2B]"/>
+                    </div>
+                    <h3 className="text-xl font-bold">Devocional Día {item}</h3>
+                    <p className="text-gray-600 mt-1">Una palabra de esperanza para este día.</p>
+                </div>
+            ))}
+          </div>
+        </section>
 
-            <div className="pt-6 border-t border-gray-100">
-              <p className="font-body text-sm text-gray-500">
-                © 2025 Un Día a la Vez. Hecho con ❤️ para la gloria de Dios
-              </p>
+        {/* Lectura Section */}
+        <section id="lectura">
+          <SectionTitle>Devocionales <span className="text-[#E95A2B]">Escritos</span></SectionTitle>
+          <SectionSubtitle>Textos inspiradores para meditar en tu tiempo personal con Dios.</SectionSubtitle>
+          <div className="max-w-5xl mx-auto mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 bg-white rounded-2xl p-8 border-2 border-black card-shadow">
+                <span className="font-bold text-[#E95A2B]">DEVOCIONAL DE HOY</span>
+                <h3 className="text-3xl font-bold mt-2 mb-4">Caminando en Fe</h3>
+                <div className="space-y-4 text-gray-700">
+                    <p className="font-semibold italic">"Por tanto, no desmayamos..." - 2 Corintios 4:16</p>
+                    <p>Cada día es una nueva oportunidad para crecer. Aunque enfrentemos desafíos, podemos confiar en que Dios está obrando en nosotros, renovando nuestro espíritu.</p>
+                </div>
+            </div>
+            <div className="space-y-6">
+                <div className="bg-orange-100 rounded-2xl p-6 border-2 border-black card-shadow">
+                    <h4 className="font-bold text-lg mb-2">Versículo del Día</h4>
+                    <p className="text-gray-700 italic">{dailyVerse.text} <br/> <span className="font-semibold not-italic">— {dailyVerse.reference}</span></p>
+                </div>
+                 <div className="bg-white rounded-2xl p-6 border-2 border-black card-shadow">
+                    <h4 className="font-bold text-lg mb-3">Lecturas Anteriores</h4>
+                    <div className="space-y-2">
+                         {['Esperanza en Tiempos Difíciles', 'La Paz que Sobrepasa'].map((title, i) => (
+                             <button key={i} onClick={() => handlePreviousReadingClick(title)} className="w-full text-left font-semibold text-gray-600 hover:text-black">› {title}</button>
+                         ))}
+                    </div>
+                </div>
             </div>
           </div>
+        </section>
+        
+        {/* Música Section */}
+        <section id="musica">
+          <SectionTitle>Música para <span className="text-[#E95A2B]">Orar</span></SectionTitle>
+          <SectionSubtitle>Melodías instrumentales para acompañar tus momentos de oración y meditación.</SectionSubtitle>
+          <div className="max-w-5xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {musicTracks.map((track, index) => (
+              <div key={index} className="bg-white rounded-2xl p-6 border-2 border-black card-shadow flex flex-col justify-between transition-transform hover:scale-105">
+                  <div>
+                      <h3 className="text-xl font-bold">{track.title}</h3>
+                      <p className="text-gray-600 mt-1">{track.description}</p>
+                  </div>
+                  <div className="flex justify-between items-center mt-4">
+                      <span className="text-sm font-semibold text-gray-500">{track.duration}</span>
+                      <button className="w-12 h-12 bg-black rounded-full flex items-center justify-center">
+                          <Play className="w-6 h-6 text-white ml-1"/>
+                      </button>
+                  </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Oración Section */}
+        <section id="oracion">
+          <SectionTitle>Compartir en <span className="text-[#E95A2B]">Oración</span></SectionTitle>
+          <SectionSubtitle>Comparte tus peticiones de oración con nuestra comunidad. No estás solo.</SectionSubtitle>
+            <div className="max-w-2xl mx-auto mt-12 bg-white rounded-2xl p-8 border-2 border-black card-shadow">
+                 <form className="space-y-6">
+                    <div>
+                        <label htmlFor="peticion" className="text-lg font-bold text-black mb-2 block">Tu Petición de Oración</label>
+                        <textarea id="peticion" rows="5" placeholder="Escribe aquí tu petición..." className="w-full p-4 bg-gray-100 rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#E95A2B]"></textarea>
+                    </div>
+                    <div>
+                        <label htmlFor="nombre" className="text-lg font-bold text-black mb-2 block">Tu Nombre (opcional)</label>
+                        <input type="text" id="nombre" placeholder="Tu nombre" className="w-full p-4 bg-gray-100 rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#E95A2B]"/>
+                    </div>
+                     <button type="submit" className="w-full py-4 bg-black text-white font-bold rounded-lg text-lg hover:bg-gray-800 transition-colors">
+                        Enviar Petición
+                     </button>
+                 </form>
+            </div>
+        </section>
+
+      </main>
+      
+      {/* --- FOOTER --- */}
+      <footer className="py-12 bg-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 className="text-2xl font-bold text-black">Un Día a la Vez</h3>
+            <p className="mt-4 text-gray-600">"Este es el día que ha hecho el Señor; Nos gozaremos y alegraremos en él" — Salmos 118:24</p>
+            <p className="mt-6 text-sm text-gray-500">© 2025 Un Día a la Vez. Hecho con ❤️ para la gloria de Dios.</p>
         </div>
       </footer>
     </div>
