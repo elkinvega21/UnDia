@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ArrowRight, Menu, X, Play, Book, Music, MessageCircle, Heart, ChevronDown, 
-  Youtube, Instagram, Facebook, Twitter, Share2, MessageSquare, ThumbsUp // Iconos para funcionalidades
+  Youtube, Instagram, Facebook, Twitter, Share2, MessageSquare, ThumbsUp, 
+  Calendar, CreditCard, DollarSign, Laptop, Home, // Icons for modality selection
+  ChevronLeft, ChevronRight, User, Mail, Phone, Lock // Icons for form and calendar
 } from 'lucide-react'; 
 
 const UnDiaALaVez = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [currentDevotional, setCurrentDevotional] = useState(null); // Para el devocional específico
+  const [currentDevotional, setCurrentDevotional] = useState(null); 
+
+  // State for the step-by-step counseling section
+  const [counselingStep, setCounselingStep] = useState('overview'); // 'overview', 'modality', 'calendar', 'confirmation', 'payment'
+  const [selectedModality, setSelectedModality] = useState(null); // 'virtual' or 'presencial'
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null); // Placeholder for time
+  const [paymentMethod, setPaymentMethod] = useState(null); // 'nequi', 'paypal', 'card'
 
   const [dailyVerse] = useState({
     text: '"Esfuérzate y sé valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo..."',
@@ -20,7 +29,8 @@ const UnDiaALaVez = () => {
     { name: 'Lectura', href: '#lectura' },
     { name: 'Música', href: '#musica' },
     { name: 'Oración', href: '#oracion' },
-    { name: 'Conóceme', href: '#conoceme' },
+    { name: 'Consejería', href: '#consejerias' },
+    { name: '4Praise Music', href: '#4praise-music' }, // Updated nav item
     { name: 'Redes', href: '#redes-sociales' }
   ];
 
@@ -123,7 +133,6 @@ const UnDiaALaVez = () => {
   // Función para manejar "Leer más" de devocionales escritos
   const handleReadMoreDevotional = (devotional) => {
     setCurrentDevotional(devotional);
-    // Asegurarse de que el scroll vaya al inicio de la página del devocional
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -132,8 +141,6 @@ const UnDiaALaVez = () => {
       if (!prevDev || prevDev.id !== devotionalId) return prevDev;
       return { ...prevDev, likes: (prevDev.likes || 0) + 1 };
     });
-    // Opcional: mostrar una alerta o animación de "like"
-    // alert('¡Gracias por tu like!'); // Puedes quitar esta alerta en producción
   };
 
   const handleCommentSubmit = (devotionalId, comment) => {
@@ -142,8 +149,6 @@ const UnDiaALaVez = () => {
       if (!prevDev || prevDev.id !== devotionalId) return prevDev;
       return { ...prevDev, comments: [...(prevDev.comments || []), comment] };
     });
-    // Opcional: mostrar una alerta de éxito
-    // alert('Comentario enviado: ' + comment); // Puedes quitar esta alerta en producción
   };
 
   const handleShareDevotional = (devotional) => {
@@ -152,7 +157,7 @@ const UnDiaALaVez = () => {
       navigator.share({
         title: devotional.title,
         text: shareText,
-        url: window.location.href // Considerar una URL específica si tuvieras enrutamiento para devocionales
+        url: window.location.href 
       }).then(() => console.log('Contenido compartido con éxito'))
         .catch((error) => console.error('Error al compartir', error));
     } else {
@@ -165,6 +170,51 @@ const UnDiaALaVez = () => {
     setIsMenuOpen(false);
     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Simulación de datos para el calendario
+  const currentMonth = "Julio 2025";
+  const daysOfWeek = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+  const calendarDays = [
+    null, null, 1, 2, 3, 4, 5, 
+    { date: 6, available: true },
+    { date: 7, available: true },
+    { date: 8, available: false }, 
+    { date: 9, available: true },
+    { date: 10, available: false }, 
+    { date: 11, available: true },
+    { date: 12, available: true },
+    { date: 13, available: false }, 
+    { date: 14, available: true },
+    { date: 15, available: true },
+    { date: 16, available: false }, 
+    { date: 17, available: true },
+    { date: 18, available: true },
+    { date: 19, available: false }, 
+    { date: 20, available: true },
+    { date: 21, available: true },
+    { date: 22, available: true },
+    { date: 23, available: true },
+    { date: 24, available: false }, 
+    { date: 25, available: true },
+    { date: 26, available: true },
+    { date: 27, available: true },
+    { date: 28, available: true },
+    { date: 29, available: true },
+    { date: 30, available: true },
+    { date: 31, available: false },
+  ];
+
+  const handleDayClick = (day) => {
+    if (day && day.available) {
+      setSelectedDate(day.date);
+      // Simulate selecting a time after day selection
+      setSelectedTime("10:00 AM"); // Example time
+      alert(`Día ${day.date} de Julio seleccionado. Se ha elegido 10:00 AM como hora provisional.`);
+    } else if (day && !day.available) {
+      alert(`El día ${day.date} de Julio no está disponible.`);
+    }
+  };
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -201,13 +251,13 @@ const UnDiaALaVez = () => {
     </p>
   );
 
-  // Si hay un devocional seleccionado, renderizamos solo la vista del devocional
+  // If a devotional is selected, render only the devotional view
   if (currentDevotional) {
     return (
       <div className="min-h-screen bg-[#F3F3F3] font-custom">
         <style jsx>{`
           @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
-          @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap'); /* Fuente para el cuerpo del texto */
+          @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
 
           .font-custom { 
               font-family: 'Poppins', sans-serif; 
@@ -248,7 +298,6 @@ const UnDiaALaVez = () => {
           }
         `}</style>
         <div className="py-16 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
-          {/* Botón Volver - Más consistente con el diseño */}
           <button 
             onClick={() => setCurrentDevotional(null)} 
             className="flex items-center space-x-2 text-black mb-8 px-4 py-2 rounded-lg bg-gray-100 border-2 border-black card-shadow hover:bg-gray-200 transition-colors text-sm font-semibold"
@@ -257,23 +306,17 @@ const UnDiaALaVez = () => {
           </button>
 
           <article className="bg-white rounded-2xl p-8 sm:p-10 lg:p-12 border-2 border-black card-shadow mb-12">
-            {/* Título y metadatos del devocional */}
             <h1 className="text-4xl md:text-5xl font-extrabold text-black mb-2 leading-tight">
               {currentDevotional.title}
             </h1>
             <p className="text-gray-600 mb-8 text-md">
               {currentDevotional.author} • {currentDevotional.date}
             </p>
-
-            {/* Contenido del devocional */}
             <div 
               className="devotional-content text-black" 
               dangerouslySetInnerHTML={{ __html: currentDevotional.fullContent }}
             ></div>
-
-            {/* Acciones del Devocional - Estilo acorde */}
             <div className="mt-10 pt-6 border-t border-gray-200 flex flex-wrap gap-4 justify-center items-center">
-              {/* Botón de Subrayar (simulado) */}
               <button 
                 onClick={() => alert('La función de subrayar texto real requeriría un editor de texto enriquecido o JS avanzado para interactuar con el DOM de la selección.')} 
                 className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-100 text-black border-2 border-black card-shadow hover:bg-gray-200 transition-colors text-sm font-semibold"
@@ -281,8 +324,6 @@ const UnDiaALaVez = () => {
                 <Book size={20} />
                 <span>Subrayar</span>
               </button>
-              
-              {/* Botón de Like */}
               <button 
                 onClick={() => handleLikeDevotional(currentDevotional.id)} 
                 className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-100 text-black border-2 border-black card-shadow hover:bg-gray-200 transition-colors text-sm font-semibold"
@@ -290,8 +331,6 @@ const UnDiaALaVez = () => {
                 <ThumbsUp size={20} />
                 <span>Me gusta ({currentDevotional.likes || 0})</span>
               </button>
-              
-              {/* Botón de Compartir */}
               <button 
                 onClick={() => handleShareDevotional(currentDevotional)} 
                 className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-100 text-black border-2 border-black card-shadow hover:bg-gray-200 transition-colors text-sm font-semibold"
@@ -302,7 +341,6 @@ const UnDiaALaVez = () => {
             </div>
           </article>
 
-          {/* Sección de Comentarios */}
           <section className="bg-white rounded-2xl p-8 sm:p-10 border-2 border-black card-shadow">
             <h3 className="text-2xl font-bold mb-6 text-black">Comentarios ({currentDevotional.comments ? currentDevotional.comments.length : 0})</h3>
             <div className="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2">
@@ -390,45 +428,51 @@ const UnDiaALaVez = () => {
             box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
         }
 
-        /* Estilos para los íconos de redes sociales */
+        /* Social Media Icons */
         .social-icon-link {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 56px; /* Tamaño del icono */
-          height: 56px; /* Tamaño del icono */
+          width: 56px; 
+          height: 56px; 
           border-radius: 50%;
-          background-color: #E95A2B; /* Color de fondo */
+          background-color: #E95A2B; 
           color: white;
           transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
         }
         .social-icon-link:hover {
           transform: translateY(-3px);
-          background-color: #C5441F; /* Un tono más oscuro al pasar el ratón */
+          background-color: #C5441F; 
         }
         .social-icon-link svg {
-          width: 32px; /* Tamaño del SVG dentro del círculo */
+          width: 32px; 
           height: 32px;
         }
 
-        /* Animación del Título Hero (Estilo Apple) */
+        /* Animations */
         @keyframes appleFadeInScaleUp {
-          0% {
-            opacity: 0;
-            transform: scale(0.95) translateY(10px);
-          }
-          70% {
-            opacity: 1;
-            transform: scale(1.01) translateY(-2px); /* Ligero overshoot */
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
+          0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+          70% { opacity: 1; transform: scale(1.01) translateY(-2px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .hero-title-animated {
+          animation: appleFadeInScaleUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
-        .hero-title-animated {
-          animation: appleFadeInScaleUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; /* Curva de easing para suavidad */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
         }
       `}</style>
 
@@ -476,7 +520,7 @@ const UnDiaALaVez = () => {
                <a href="#oracion" className="block w-full text-center mt-2 bg-black text-white font-semibold px-5 py-3 rounded-lg text-lg hover:bg-gray-800 transition-colors" onClick={() => handleMobileMenuClick('#oracion')}>
                   Pide Oración
                </a>
-             </div>
+            </div>
         </div>
       </header>
 
@@ -484,13 +528,12 @@ const UnDiaALaVez = () => {
       <section id="inicio" className="min-h-screen flex flex-col justify-center items-center text-center px-4">
         <div className="max-w-4xl mx-auto pt-32 pb-8">
             <h1 className="text-6xl md:text-8xl font-extrabold text-black tracking-tighter leading-tight hero-title-animated">
-                UN DÍA <span className="circle-doodle">A LA VEZ</span>, EL ESPACIO QUE SERÁ <span className="underline-doodle">LA BASE DE TU FE</span>
+                Un día <span className="circle-doodle">a la vez</span>, un espacio para <span className="underline-doodle">conectar con Dios</span>.
             </h1>
             <p className="mt-12 text-xl text-gray-600 max-w-2xl mx-auto">
-                Juntos construiremos un cimiento fuerte para tu vida espiritual, sin importar las circunstancias.
+                Juntos construiremos una relación fuerte, cercana y personal con Dios, bajo cualquier circunstancia.
             </p>
         </div>
-        {/* Aquí se eliminó el corazón, solo queda la flecha */}
         <a href="#devocional" className="absolute bottom-8 animate-bounce">
           <ChevronDown className="text-[#E95A2B]" size={32} />
         </a>
@@ -502,8 +545,8 @@ const UnDiaALaVez = () => {
         {/* Devocional Section (YouTube Videos) */}
         <section id="devocional">
           <SectionTitle>Devocionales en <span className="text-[#E95A2B]">Video</span></SectionTitle>
-          <SectionSubtitle>Momentos de reflexión diaria para fortalecer tu fe y renovar tu esperanza.</SectionSubtitle>
-          <div className="max-w-5xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 gap-8"> {/* Grid para 2 videos */}
+          <SectionSubtitle>Dale play a tu devocional diario.</SectionSubtitle>
+          <div className="max-w-5xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
             {devotionalVideos.map((video) => (
               <div 
                 key={video.id} 
@@ -524,7 +567,6 @@ const UnDiaALaVez = () => {
                   </div>
                   <h3 className="text-xl font-bold">{video.title}</h3>
                   <p className="text-gray-600 mt-1">{video.description}</p>
-                  {/* No hay botón "Leer más" para videos, ya que el contenido es el video */}
               </div>
             ))}
           </div>
@@ -533,7 +575,7 @@ const UnDiaALaVez = () => {
         {/* Lectura Section */}
         <section id="lectura">
           <SectionTitle>Devocionales <span className="text-[#E95A2B]">Escritos</span></SectionTitle>
-          <SectionSubtitle>Textos inspiradores para meditar en tu tiempo personal con Dios.</SectionSubtitle>
+          <SectionSubtitle>Para ti que disfrutas de una buena lectura.</SectionSubtitle>
           <div className="max-w-5xl mx-auto mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 bg-white rounded-2xl p-8 border-2 border-black card-shadow">
                 <span className="font-bold text-[#E95A2B]">DEVOCIONAL DE HOY</span>
@@ -543,7 +585,7 @@ const UnDiaALaVez = () => {
                     <p>Cada día es una nueva oportunidad para crecer. Aunque enfrentemos desafíos, podemos confiar en que Dios está obrando en nosotros, renovando nuestro espíritu.</p>
                 </div>
                 <button 
-                  onClick={() => handleReadMoreDevotional(devotionalTexts[0])} // Asumiendo que el primero es "Caminando en Fe"
+                  onClick={() => handleReadMoreDevotional(devotionalTexts[0])} 
                   className="mt-6 bg-black text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors"
                 >
                   Leer Completo <ArrowRight size={16} className="inline-block ml-1" />
@@ -554,18 +596,18 @@ const UnDiaALaVez = () => {
                     <h4 className="font-bold text-lg mb-2">Versículo del Día</h4>
                     <p className="text-gray-700 italic">{dailyVerse.text} <br/> <span className="font-semibold not-italic">— {dailyVerse.reference}</span></p>
                 </div>
-                   <div className="bg-white rounded-2xl p-6 border-2 border-black card-shadow">
+                    <div className="bg-white rounded-2xl p-6 border-2 border-black card-shadow">
                     <h4 className="font-bold text-lg mb-3">Lecturas Anteriores</h4>
                     <div className="space-y-2">
-                           {devotionalTexts.slice(1).map((dev, i) => ( // Excluye el primero que ya se muestra
-                               <button 
-                                 key={dev.id} 
-                                 onClick={() => handleReadMoreDevotional(dev)} 
-                                 className="w-full text-left font-semibold text-gray-600 hover:text-black"
-                               >
-                                 › {dev.title}
-                               </button>
-                           ))}
+                            {devotionalTexts.slice(1).map((dev, i) => ( 
+                                <button 
+                                  key={dev.id} 
+                                  onClick={() => handleReadMoreDevotional(dev)} 
+                                  className="w-full text-left font-semibold text-gray-600 hover:text-black"
+                                >
+                                  › {dev.title}
+                                </button>
+                            ))}
                     </div>
                 </div>
             </div>
@@ -575,18 +617,16 @@ const UnDiaALaVez = () => {
         {/* Música Section */}
         <section id="musica">
           <SectionTitle>Música para <span className="text-[#E95A2B]">Orar</span></SectionTitle>
-          <SectionSubtitle>Melodías instrumentales para acompañar tus momentos de oración y meditación.</SectionSubtitle>
+          <SectionSubtitle>Dale un fondo musical a tu momento de oración.</SectionSubtitle>
           <div className="max-w-5xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Música Ambiental de YouTube (con opción futura a Spotify) */}
             <div className="lg:col-span-3 bg-white rounded-2xl p-6 border-2 border-black card-shadow flex flex-col items-center justify-center transition-transform hover:scale-105">
               <h3 className="text-2xl font-bold mb-4">{ambientMusic.title}</h3>
               <p className="text-gray-600 mb-6 text-center">{ambientMusic.description}</p>
               <div className="aspect-video w-full max-w-2xl bg-gray-200 rounded-lg overflow-hidden">
-                {/* Actualmente YouTube Embed */}
                 <iframe
                   width="100%"
                   height="100%"
-                  src={`https://www.youtube.com/embed/${ambientMusic.youtubeId}?autoplay=1&loop=1&playlist=${ambientMusic.youtubeId}`} // Autoplay y loop
+                  src={`https://www.youtube.com/embed/${ambientMusic.youtubeId}?autoplay=1&loop=1&playlist=${ambientMusic.youtubeId}`}
                   title={ambientMusic.title}
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -594,134 +634,459 @@ const UnDiaALaVez = () => {
                   allowFullScreen
                   className="rounded-lg"
                 ></iframe>
-                {/* FUTURO: Botón para Spotify (comentado, requiere implementación de API) */}
-                {/*
-                <button
-                  onClick={() => alert('Integrar reproductor de Spotify aquí con el track ID: ' + ambientMusic.spotifyTrackId)}
-                  className="mt-4 bg-green-500 text-white font-semibold px-6 py-3 rounded-lg text-lg hover:bg-green-600 transition-colors hidden"
-                >
-                  Reproducir en Spotify
-                </button>
-                */}
               </div>
             </div>
             
-            {/* Otros tracks de música */}
             {musicTracks.map((track, index) => (
-              <div key={index} className="bg-white rounded-2xl p-6 border-2 border-black card-shadow flex flex-col justify-between transition-transform hover:scale-105">
-                  <div>
-                      <h3 className="text-xl font-bold">{track.title}</h3>
-                      <p className="text-gray-600 mt-1">{track.description}</p>
-                  </div>
-                  <div className="flex justify-between items-center mt-4">
-                      <span className="text-sm font-semibold text-gray-500">{track.duration}</span>
-                      <button className="w-12 h-12 bg-black rounded-full flex items-center justify-center">
-                          <Play className="w-6 h-6 text-white ml-1"/>
-                      </button>
-                  </div>
+              <div key={index} className="bg-white rounded-2xl p-6 border-2 border-black card-shadow flex flex-col items-center justify-center">
+                <Music size={48} className="text-[#E95A2B] mb-4" />
+                <h3 className="text-xl font-bold mb-2 text-center">{track.title}</h3>
+                <p className="text-gray-600 text-center">{track.description}</p>
+                <span className="text-sm text-gray-500 mt-2">{track.duration}</span>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Conóceme Section */}
-        <section id="conoceme">
-          <SectionTitle>Conoce al <span className="text-[#E95A2B]">Capellán</span></SectionTitle>
-          <SectionSubtitle>Un vistazo a la vida y misión del Capellán Christian Suarez.</SectionSubtitle>
-          <div className="max-w-5xl mx-auto mt-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="bg-white rounded-2xl p-8 border-2 border-black card-shadow text-center">
-              <img 
-                src="/assets/images/A7407939.jpg" 
-                alt="Capellán Christian Suarez 1" 
-                className="w-full h-auto rounded-xl object-cover mb-6 border-2 border-black card-shadow"
-              />
-              <h3 className="text-2xl font-bold mb-3">Christian Suarez</h3>
-              <p className="text-gray-700 leading-relaxed">
-                El Capellán Christian Suarez es un siervo dedicado con un corazón apasionado por llevar la palabra de Dios. Su ministerio se enfoca en la edificación espiritual y el acompañamiento en la fe.
-              </p>
-            </div>
-            <div className="bg-white rounded-2xl p-8 border-2 border-black card-shadow text-center">
-              <img 
-                src="/assets/images/A7407940.jpg" 
-                alt="Capellán Christian Suarez 2" 
-                className="w-full h-auto rounded-xl object-cover mb-6 border-2 border-black card-shadow"
-              />
-              <h3 className="text-2xl font-bold mb-3">Su Misión</h3>
-              <p className="text-gray-700 leading-relaxed">
-                A través de devocionales, música y mensajes inspiradores, el Capellán Suarez busca guiar a las personas a encontrar fortaleza y consuelo en su caminar diario con Cristo.
-              </p>
-            </div>
-          </div>
-           {/* Sección para 4Praise MEJORADA */}
-           <div className="max-w-3xl mx-auto mt-12 bg-white rounded-2xl p-8 border-2 border-black card-shadow text-center">
-             <img 
-                src="/assets/images/4praise.jpg" 
-                alt="Grupo 4Praise" 
-                className="w-full h-auto rounded-xl object-cover mb-6 border-2 border-black card-shadow"
-              />
-             <h3 className="text-2xl font-bold mb-3">4Praise: Voces de Adoración</h3>
-             <p className="text-gray-700 leading-relaxed">
-               El Capellán Christian Suarez es un miembro integral de 4Praise, un grupo vocal dedicado a elevar la adoración a través de la música. Con armonías cautivadoras y letras que profundizan en la fe, 4Praise busca inspirar y conectar corazones con mensajes de esperanza y el amor de Dios. Su ministerio musical es una extensión del propósito de Capellán Christian, llevando consuelo y gozo a través del canto.
-             </p>
-             <a href="URL_DE_4PRAISE_YOUTUBE_O_REDES" target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center bg-[#E95A2B] text-white font-semibold px-6 py-3 rounded-lg text-lg hover:bg-[#C5441F] transition-colors">
-                Conoce más de 4Praise <ArrowRight size={20} className="ml-2" />
-             </a>
-           </div>
-        </section>
-
-        {/* Redes Sociales Section */}
-        <section id="redes-sociales">
-          <SectionTitle>Conéctate con nosotros</SectionTitle>
-          <SectionSubtitle>Encuéntranos en nuestras plataformas sociales para más contenido y actualizaciones.</SectionSubtitle>
-          <div className="max-w-xl mx-auto mt-12 flex justify-center items-center gap-8 py-4 px-6 bg-white rounded-2xl border-2 border-black card-shadow">
-            {socialLinks.map((link) => {
-              const IconComponent = link.icon; 
-              return (
-                <a 
-                  key={link.name} 
-                  href={link.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  aria-label={`Visita nuestro ${link.name}`}
-                  className="social-icon-link"
-                >
-                  {IconComponent && <IconComponent />}
-                  {!IconComponent && <span className="text-xl font-bold">{link.name.substring(0,1)}</span>}
-                </a>
-              );
-            })}
+        {/* Prayer Request Section */}
+        <section id="oracion" className="max-w-4xl mx-auto text-center px-4">
+          <SectionTitle>Peticiones de <span className="text-[#E95A2B]">Oración</span></SectionTitle>
+          <SectionSubtitle>Comparte tus intenciones y oraremos contigo, juntos en fe.</SectionSubtitle>
+          <div className="bg-white rounded-2xl p-8 border-2 border-black card-shadow mt-12 max-w-2xl mx-auto">
+            <h3 className="text-2xl font-bold mb-6 text-black">Envía tu Petición</h3>
+            <form className="space-y-6">
+              <div>
+                <label htmlFor="prayer-request" className="sr-only">Tu petición de oración</label>
+                <textarea
+                  id="prayer-request"
+                  rows="5"
+                  className="w-full p-4 border-2 border-black rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E95A2B] text-black placeholder-gray-500"
+                  placeholder="Escribe aquí tu petición de oración..."
+                ></textarea>
+              </div>
+              <div>
+                <label htmlFor="name" className="sr-only">Tu nombre (opcional)</label>
+                <input
+                  type="text"
+                  id="name"
+                  className="w-full p-4 border-2 border-black rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E95A2B] text-black placeholder-gray-500"
+                  placeholder="Tu nombre (opcional)"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-black text-white font-semibold px-6 py-3 rounded-lg text-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2"
+              >
+                <MessageCircle size={24} />
+                <span>Enviar Petición</span>
+              </button>
+            </form>
           </div>
         </section>
 
-        {/* Oración Section */}
-        <section id="oracion">
-          <SectionTitle>Compartir en <span className="text-[#E95A2B]">Oración</span></SectionTitle>
-          <SectionSubtitle>Comparte tus peticiones de oración con nuestra comunidad. No estás solo.</SectionSubtitle>
-            <div className="max-w-2xl mx-auto mt-12 bg-white rounded-2xl p-8 border-2 border-black card-shadow">
-                       <form className="space-y-6">
-                         <div>
-                             <label htmlFor="peticion" className="text-lg font-bold text-black mb-2 block">Tu Petición de Oración</label>
-                             <textarea id="peticion" rows="5" placeholder="Escribe aquí tu petición..." className="w-full p-4 bg-gray-100 rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#E95A2B]"></textarea>
-                         </div>
-                         <div>
-                             <label htmlFor="nombre" className="text-lg font-bold text-black mb-2 block">Tu Nombre (opcional)</label>
-                             <input type="text" id="nombre" placeholder="Tu nombre" className="w-full p-4 bg-gray-100 rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#E95A2B]"/>
-                         </div>
-                           <button type="submit" className="w-full py-4 bg-black text-white font-bold rounded-lg text-lg hover:bg-gray-800 transition-colors">
-                             Enviar Petición
-                           </button>
-                       </form>
-            </div>
+        {/* Consejería Espiritual - Step-by-Step */}
+        <section id="consejerias" className="max-w-6xl mx-auto text-center px-4">
+          <SectionTitle>Consejería <span className="text-[#E95A2B]">Espiritual</span></SectionTitle>
+          <SectionSubtitle>
+            Acompañamiento personalizado para fortalecer tu camino de fe.
+          </SectionSubtitle>
+          
+          <div className="bg-white rounded-3xl p-8 lg:p-12 border-2 border-black card-shadow mt-16 overflow-hidden relative min-h-[700px] flex items-center justify-center">
+            
+            {/* Step 1: Overview and Counselor Bio */}
+            {counselingStep === 'overview' && (
+              <div className="flex flex-col lg:flex-row items-center justify-center gap-10 fade-in w-full max-w-4xl">
+                <div className="flex flex-col items-center lg:items-start text-center lg:text-left p-4 lg:pr-8">
+                  <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden mb-6 border-4 border-[#E95A2B] shadow-lg">
+                    <img 
+                      src={"https://via.placeholder.com/192x192?text=Cristian+Suarez"} 
+                      alt="Cristian Suárez" 
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+                  <h3 className="text-4xl font-extrabold mb-2 text-black">Cristian Suárez</h3>
+                  <p className="text-[#E95A2B] text-xl font-semibold mb-4">
+                    Teólogo, Pastor, Músico y Capellán
+                  </p>
+                  <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                    Con una sólida formación y una Maestría en Consejería Bíblica, Cristian se dedica a ofrecer un acompañamiento espiritual profundo y personalizado. Su pasión es guiarte en la construcción de una relación más fuerte y personal con Dios, brindándote apoyo, discernimiento y sabiduría bíblica en cada paso de tu camino.
+                  </p>
+                  <ul className="text-gray-800 text-lg space-y-2 text-left">
+                    <li className="flex items-center">
+                      <Book size={20} className="text-[#E95A2B] mr-3 flex-shrink-0" />
+                      <span>Maestría en Consejería Bíblica</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Heart size={20} className="text-[#E95A2B] mr-3 flex-shrink-0" />
+                      <span>Acompañamiento espiritual y emocional</span>
+                    </li>
+                    <li className="flex items-center">
+                      <MessageSquare size={20} className="text-[#E95A2B] mr-3 flex-shrink-0" />
+                      <span>Enfoque centrado en la fe y principios bíblicos</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="w-full lg:w-auto mt-8 lg:mt-0 text-center lg:text-left">
+                  <button 
+                    onClick={() => setCounselingStep('modality')}
+                    className="w-full max-w-xs bg-black text-white font-semibold px-8 py-4 rounded-lg text-xl hover:bg-gray-800 transition-colors flex items-center justify-center space-x-3 card-shadow"
+                  >
+                    <span>Iniciar Reserva</span>
+                    <ArrowRight size={24} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Modality Selection */}
+            {counselingStep === 'modality' && (
+              <div className="flex flex-col items-center fade-in w-full max-w-2xl text-center">
+                <h3 className="text-3xl font-extrabold text-black mb-8">Paso 1: Elige tu Modalidad</h3>
+                <div className="flex flex-col sm:flex-row gap-6 w-full justify-center">
+                  <button 
+                    onClick={() => setSelectedModality('virtual')} 
+                    className={`flex-1 min-w-0 sm:min-w-[unset] p-8 rounded-2xl border-2 border-black card-shadow flex flex-col items-center justify-center space-y-4 transition-transform hover:scale-105 ${selectedModality === 'virtual' ? 'bg-[#E95A2B] text-white' : 'bg-gray-100 text-black'}`}
+                  >
+                    <Laptop size={48} className={`${selectedModality === 'virtual' ? 'text-white' : 'text-[#E95A2B]'}`} />
+                    <span className="text-2xl font-bold">Virtual</span>
+                    <p className={`text-md ${selectedModality === 'virtual' ? 'text-white/90' : 'text-gray-600'}`}>
+                      Desde la comodidad de tu hogar, vía videollamada.
+                    </p>
+                  </button>
+                  <button 
+                    onClick={() => setSelectedModality('presencial')} 
+                    className={`flex-1 min-w-0 sm:min-w-[unset] p-8 rounded-2xl border-2 border-black card-shadow flex flex-col items-center justify-center space-y-4 transition-transform hover:scale-105 ${selectedModality === 'presencial' ? 'bg-[#E95A2B] text-white' : 'bg-gray-100 text-black'}`}
+                  >
+                    <Home size={48} className={`${selectedModality === 'presencial' ? 'text-white' : 'text-[#E95A2B]'}`} />
+                    <span className="text-2xl font-bold">Presencial</span>
+                    <p className={`text-md ${selectedModality === 'presencial' ? 'text-white/90' : 'text-gray-600'}`}>
+                      En nuestra ubicación designada para un encuentro personal.
+                    </p>
+                  </button>
+                </div>
+                <div className="mt-10 flex gap-4">
+                  <button 
+                    onClick={() => setCounselingStep('overview')}
+                    className="bg-gray-200 text-black font-semibold px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors flex items-center space-x-2"
+                  >
+                    <ChevronLeft size={20} />
+                    <span>Anterior</span>
+                  </button>
+                  <button 
+                    onClick={() => setCounselingStep('calendar')} 
+                    disabled={!selectedModality}
+                    className={`bg-black text-white font-semibold px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 ${!selectedModality ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800'}`}
+                  >
+                    <span>Siguiente</span>
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Calendar & Time Selection */}
+            {counselingStep === 'calendar' && (
+              <div className="flex flex-col items-center fade-in w-full max-w-xl text-center">
+                <h3 className="text-3xl font-extrabold text-black mb-8">Paso 2: Elige Fecha y Hora</h3>
+                <div className="w-full bg-orange-50 rounded-lg p-6 border border-gray-300 shadow-inner">
+                    <div className="flex justify-between items-center mb-4">
+                        <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                            <ChevronLeft size={24} className="text-gray-700" />
+                        </button>
+                        <span className="text-xl font-semibold text-black">{currentMonth}</span>
+                        <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                            <ChevronRight size={24} className="text-gray-700" />
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-500 mb-2">
+                        {daysOfWeek.map(day => (
+                            <div key={day} className="text-center">{day}</div>
+                        ))}
+                    </div>
+                    <div className="grid grid-cols-7 gap-2">
+                        {calendarDays.map((day, index) => (
+                            <div 
+                                key={index} 
+                                className={`
+                                    flex items-center justify-center aspect-square rounded-lg transition-colors text-lg font-bold
+                                    ${day === null ? 'bg-transparent text-gray-300 cursor-not-allowed' : ''}
+                                    ${day && day.available ? 'bg-green-100 text-green-800 border border-green-200 cursor-pointer hover:bg-green-200' : ''}
+                                    ${day && !day.available ? 'bg-red-50 text-red-600 border border-red-100 cursor-not-allowed line-through opacity-70' : ''}
+                                    ${selectedDate === day?.date ? 'border-2 border-[#E95A2B] ring-2 ring-[#E95A2B]' : ''}
+                                `}
+                                onClick={() => handleDayClick(day)}
+                                style={{ minWidth: '30px', minHeight: '30px' }}
+                            >
+                                {day?.date || ''}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-center gap-4 mt-6 text-sm">
+                        <div className="flex items-center">
+                            <span className="w-4 h-4 rounded-full bg-green-100 border border-green-200 mr-2"></span>
+                            <span>Disponible</span>
+                        </div>
+                        <div className="flex items-center">
+                            <span className="w-4 h-4 rounded-full bg-red-50 border border-red-100 mr-2"></span>
+                            <span>No Disponible</span>
+                        </div>
+                    </div>
+                </div>
+                {selectedDate && (
+                    <div className="mt-6 w-full text-center fade-in">
+                        <p className="text-xl font-semibold text-black mb-4">Horarios disponibles para el {selectedDate} de {currentMonth.split(' ')[0]}:</p>
+                        <div className="flex flex-wrap justify-center gap-3">
+                            {/* Simulated time slots */}
+                            {["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM"].map(time => (
+                                <button 
+                                    key={time} 
+                                    onClick={() => setSelectedTime(time)}
+                                    className={`px-5 py-2 rounded-lg border-2 border-black font-semibold transition-colors ${selectedTime === time ? 'bg-black text-white' : 'bg-gray-100 text-black hover:bg-gray-200'}`}
+                                >
+                                    {time}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                <div className="mt-10 flex gap-4">
+                  <button 
+                    onClick={() => setCounselingStep('modality')}
+                    className="bg-gray-200 text-black font-semibold px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors flex items-center space-x-2"
+                  >
+                    <ChevronLeft size={20} />
+                    <span>Anterior</span>
+                  </button>
+                  <button 
+                    onClick={() => setCounselingStep('confirmation')} 
+                    disabled={!selectedDate || !selectedTime}
+                    className={`bg-black text-white font-semibold px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 ${!selectedDate || !selectedTime ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800'}`}
+                  >
+                    <span>Siguiente</span>
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Confirmation */}
+            {counselingStep === 'confirmation' && (
+              <div className="flex flex-col items-center fade-in w-full max-w-2xl text-center">
+                <h3 className="text-3xl font-extrabold text-black mb-8">Paso 3: Confirma tu Reserva</h3>
+                <div className="bg-orange-50 rounded-lg p-8 border-2 border-black card-shadow w-full">
+                  <h4 className="text-2xl font-bold text-black mb-4">Resumen de la Cita:</h4>
+                  <ul className="text-lg text-gray-800 space-y-3 text-left">
+                    <li className="flex items-center"><User size={20} className="mr-3 text-[#E95A2B]" /> <strong>Consejero:</strong> Cristian Suárez</li>
+                    <li className="flex items-center"><Laptop size={20} className="mr-3 text-[#E95A2B]" /> <strong>Modalidad:</strong> {selectedModality === 'virtual' ? 'Virtual' : 'Presencial'}</li>
+                    <li className="flex items-center"><Calendar size={20} className="mr-3 text-[#E95A2B]" /> <strong>Fecha:</strong> {selectedDate} de {currentMonth.split(' ')[0]}, {currentMonth.split(' ')[1]}</li>
+                    <li className="flex items-center"><img src={"https://img.icons8.com/ios-filled/24/null/time.png"} alt="Time Icon" className="h-5 w-5 mr-3" /> <strong>Hora:</strong> {selectedTime}</li>
+                    <li className="flex items-center"><DollarSign size={20} className="mr-3 text-[#E95A2B]" /> <strong>Costo:</strong> $80.000 COP (simulado)</li>
+                  </ul>
+                  <p className="text-sm text-gray-600 italic mt-6">
+                    Por favor, revisa cuidadosamente los detalles antes de proceder al pago.
+                  </p>
+                </div>
+                <div className="mt-10 flex gap-4">
+                  <button 
+                    onClick={() => setCounselingStep('calendar')}
+                    className="bg-gray-200 text-black font-semibold px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors flex items-center space-x-2"
+                  >
+                    <ChevronLeft size={20} />
+                    <span>Anterior</span>
+                  </button>
+                  <button 
+                    onClick={() => setCounselingStep('payment')}
+                    className="bg-black text-white font-semibold px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center space-x-2"
+                  >
+                    <span>Confirmar y Continuar al Pago</span>
+                    <ArrowRight size={20} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 5: Payment Form */}
+            {counselingStep === 'payment' && (
+              <div className="flex flex-col items-center fade-in w-full max-w-2xl text-center">
+                <h3 className="text-3xl font-extrabold text-black mb-8">Paso 4: Realiza tu Pago</h3>
+                <div className="bg-orange-50 rounded-lg p-8 border-2 border-black card-shadow w-full text-left">
+                  <p className="text-gray-700 text-lg mb-6">
+                    Completa la información a continuación para asegurar tu cita. Todas las transacciones son seguras y cifradas.
+                  </p>
+
+                  <form className="space-y-6">
+                    <div>
+                      <label htmlFor="payer-name" className="block text-gray-700 text-sm font-bold mb-2">Nombre Completo:</label>
+                      <div className="relative">
+                        <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input type="text" id="payer-name" placeholder="Tu Nombre Completo" className="w-full p-3 pl-10 border-2 border-black rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E95A2B] text-black" />
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="payer-email" className="block text-gray-700 text-sm font-bold mb-2">Correo Electrónico:</label>
+                      <div className="relative">
+                        <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input type="email" id="payer-email" placeholder="tu.email@ejemplo.com" className="w-full p-3 pl-10 border-2 border-black rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E95A2B] text-black" />
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="payer-phone" className="block text-gray-700 text-sm font-bold mb-2">Número de Teléfono:</label>
+                      <div className="relative">
+                        <Phone size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input type="tel" id="payer-phone" placeholder="Ej: 300 123 4567" className="w-full p-3 pl-10 border-2 border-black rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E95A2B] text-black" />
+                      </div>
+                    </div>
+
+                    <div className="border-t border-gray-300 pt-6 mt-6">
+                      <h4 className="text-xl font-bold text-black mb-4">Selecciona tu Método de Pago:</h4>
+                      <div className="space-y-4">
+                        {/* Nequi */}
+                        <label className="flex items-center p-4 border-2 border-black rounded-lg bg-white cursor-pointer hover:bg-gray-50 transition-colors">
+                          <input type="radio" name="payment-method" value="nequi" className="form-radio h-5 w-5 text-[#E95A2B] focus:ring-[#E95A2B]" onChange={() => setPaymentMethod('nequi')} checked={paymentMethod === 'nequi'} />
+                          <img src={"https://via.placeholder.com/60x30?text=Nequi"} alt="Nequi Logo" className="h-6 w-auto object-contain ml-4" />
+                          <span className="ml-3 font-semibold text-gray-800">Nequi</span>
+                          <span className="ml-auto text-sm text-gray-500">Pago móvil</span>
+                        </label>
+
+                        {/* PayPal */}
+                        <label className="flex items-center p-4 border-2 border-black rounded-lg bg-white cursor-pointer hover:bg-gray-50 transition-colors">
+                          <input type="radio" name="payment-method" value="paypal" className="form-radio h-5 w-5 text-[#E95A2B] focus:ring-[#E95A2B]" onChange={() => setPaymentMethod('paypal')} checked={paymentMethod === 'paypal'} />
+                          <img src={"https://via.placeholder.com/80x30?text=PayPal"} alt="PayPal Logo" className="h-6 w-auto object-contain ml-4" />
+                          <span className="ml-3 font-semibold text-gray-800">PayPal</span>
+                          <span className="ml-auto text-sm text-gray-500">Internacional</span>
+                        </label>
+
+                        {/* Card/PSE */}
+                        <label className="flex items-center p-4 border-2 border-black rounded-lg bg-white cursor-pointer hover:bg-gray-50 transition-colors">
+                          <input type="radio" name="payment-method" value="card" className="form-radio h-5 w-5 text-[#E95A2B] focus:ring-[#E95A2B]" onChange={() => setPaymentMethod('card')} checked={paymentMethod === 'card'} />
+                          <img src={"https://via.placeholder.com/100x30?text=Tarjetas/PSE"} alt="Cards/PSE Logo" className="h-6 w-auto object-contain ml-4" />
+                          <span className="ml-3 font-semibold text-gray-800">Tarjeta de Crédito/Débito o PSE</span>
+                        </label>
+                      </div>
+
+                      {/* Dynamic payment input based on selection (simulated) */}
+                      {paymentMethod === 'nequi' && (
+                        <div className="mt-6 fade-in">
+                          <label htmlFor="nequi-number" className="block text-gray-700 text-sm font-bold mb-2">Número Nequi:</label>
+                          <input type="text" id="nequi-number" placeholder="Ej: 3001234567" className="w-full p-3 border-2 border-black rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E95A2B] text-black" disabled={!paymentMethod} />
+                        </div>
+                      )}
+                      {paymentMethod === 'paypal' && (
+                        <div className="mt-6 fade-in">
+                          <label htmlFor="paypal-email" className="block text-gray-700 text-sm font-bold mb-2">Correo Electrónico PayPal:</label>
+                          <input type="email" id="paypal-email" placeholder="tu.paypal@ejemplo.com" className="w-full p-3 border-2 border-black rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E95A2B] text-black" disabled={!paymentMethod} />
+                        </div>
+                      )}
+                      {paymentMethod === 'card' && (
+                        <div className="mt-6 space-y-4 fade-in">
+                          <div>
+                            <label htmlFor="card-number" className="block text-gray-700 text-sm font-bold mb-2">Número de Tarjeta:</label>
+                            <input type="text" id="card-number" placeholder="XXXX XXXX XXXX XXXX" className="w-full p-3 border-2 border-black rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E95A2B] text-black" disabled={!paymentMethod} />
+                          </div>
+                          <div className="flex gap-4">
+                            <div className="w-1/2">
+                              <label htmlFor="expiry-date" className="block text-gray-700 text-sm font-bold mb-2">Fecha de Vencimiento (MM/AA):</label>
+                              <input type="text" id="expiry-date" placeholder="MM/AA" className="w-full p-3 border-2 border-black rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E95A2B] text-black" disabled={!paymentMethod} />
+                            </div>
+                            <div className="w-1/2">
+                              <label htmlFor="cvc" className="block text-gray-700 text-sm font-bold mb-2">CVC:</label>
+                              <input type="text" id="cvc" placeholder="XXX" className="w-full p-3 border-2 border-black rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E95A2B] text-black" disabled={!paymentMethod} />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </form>
+                  <p className="text-2xl font-bold text-black mt-8 text-center">Total a Pagar: <span className="text-[#E95A2B]">$80.000 COP</span></p>
+
+                  <div className="mt-8 flex gap-4 justify-center">
+                    <button 
+                        onClick={() => setCounselingStep('confirmation')}
+                        className="bg-gray-200 text-black font-semibold px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors flex items-center space-x-2"
+                    >
+                        <ChevronLeft size={20} />
+                        <span>Anterior</span>
+                    </button>
+                    <button 
+                        onClick={() => alert('Simulando pago. ¡Próximamente se procesará tu pago y reserva!')}
+                        className="bg-black text-white font-semibold px-8 py-4 rounded-lg text-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-3 cursor-not-allowed opacity-50"
+                        disabled
+                    >
+                        <Lock size={24} />
+                        <span>Pagar y Confirmar Cita</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
         </section>
 
+        {/* Sección: Conoce 4Praise Music */}
+        <section id="4praise-music" className="max-w-5xl mx-auto text-center px-4">
+          <SectionTitle>Conoce <span className="text-[#E95A2B]">4Praise Music</span></SectionTitle>
+          <SectionSubtitle>Adoración que eleva tu espíritu y transforma tu día.</SectionSubtitle>
+          <div className="bg-white rounded-2xl p-8 border-2 border-black card-shadow mt-12 max-w-lg mx-auto flex flex-col items-center transition-transform hover:scale-105">
+            <h3 className="text-2xl font-bold mb-6 text-black">Explora su Música</h3>
+            <img 
+              src={"image_acc045.png"}
+              alt="4Praise Logo" 
+              className="w-full max-w-xs rounded-lg mb-6 border-2 border-black" 
+            />
+            <p className="text-gray-700 text-lg mb-6">
+              Descubre las melodías inspiradoras de 4Praise, un proyecto musical dedicado a llevar mensajes de fe y esperanza a través de la adoración. Sumérgete en su sonido y permite que sus canciones acompañen tus momentos de conexión con Dios.
+            </p>
+            <a 
+              href="https://www.youtube.com/@4PraiseMusic" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full bg-black text-white font-semibold px-6 py-3 rounded-lg text-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2"
+            >
+              <Youtube size={24} />
+              <span>Visitar Canal de YouTube</span>
+            </a>
+          </div>
+        </section>
+
+        {/* Social Media Section */}
+        <section id="redes-sociales" className="max-w-4xl mx-auto text-center px-4">
+          <SectionTitle>Conecta en <span className="text-[#E95A2B]">Redes Sociales</span></SectionTitle>
+          <SectionSubtitle>Síguenos para devocionales diarios, actualizaciones y más contenido inspirador.</SectionSubtitle>
+          <div className="flex flex-wrap justify-center gap-6 mt-12">
+            {socialLinks.map((link) => (
+              <a 
+                key={link.name} 
+                href={link.url} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="social-icon-link"
+                aria-label={`Visita nuestro ${link.name}`}
+              >
+                <link.icon />
+              </a>
+            ))}
+          </div>
+        </section>
       </main>
-      
+
       {/* --- FOOTER --- */}
-      <footer className="py-12 bg-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h3 className="text-2xl font-bold text-black">Un Día a la Vez</h3>
-            <p className="mt-4 text-gray-600">"Este es el día que ha hecho el Señor; Nos gozaremos y alegraremos en él" — Salmos 118:24</p>
-            <p className="mt-6 text-sm text-gray-500">© 2025 Un Día a la Vez. Hecho con ❤️ para la gloria de Dios.</p>
+      <footer className="bg-black text-white py-12 text-center px-4">
+        <div className="max-w-4xl mx-auto">
+          <h3 className="text-3xl font-bold mb-4">Un Día a la Vez</h3>
+          <p className="text-gray-400 mb-6">
+            Construyendo una relación fuerte, cercana y personal con Dios, bajo cualquier circunstancia.
+          </p>
+          <div className="flex justify-center space-x-6 mb-8">
+            {socialLinks.map((link) => (
+              <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <link.icon size={24} />
+              </a>
+            ))}
+          </div>
+          <p className="text-gray-500 text-sm">
+            © {new Date().getFullYear()} Un Día a la Vez. Todos los derechos reservados.
+          </p>
         </div>
       </footer>
     </div>
